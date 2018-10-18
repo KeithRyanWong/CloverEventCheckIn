@@ -9,6 +9,7 @@ import requests
 import random
 import logging
 import json
+import uuid
 
 # sandbox_host = 'sandbox.dev.clover.com'
 # prod_host = 'clover.com'
@@ -28,7 +29,7 @@ token = ''
 #     return prod_host + endpoint
     
 def getToken():
-    return ''
+    return input('Token pls: ')
 
 def normalize(input):
     name = input.strip()
@@ -40,7 +41,7 @@ def normalize(input):
 def parseContactList(list):
     parsed_list = []
 
-    with open('Test Email List.csv', mode='r') as csv_file:
+    with open(list, mode='r') as csv_file:
         csv_reader = csv.DictReader(csv_file)
         line_count = 0
         for row in csv_reader:
@@ -59,12 +60,18 @@ def generateQRCode(content):
     img = qrcode.make(content)
     return img
 
-#Change to encode for customer ID
-def encodeEmails(list):
-    for attendee in list:
-        qrcode = generateQRCode(attendee["Email"])
-        qrcode.save(f'./codes/{attendee["First Name"]}QRCode', 'png')
-        attendee["QR Code"] = f'{attendee["First Name"]}{attendee["Last Name"]}QRCode.png'
+def saveQRCode(content, filename):
+    file_path = f'./codes/{filename}qrcode'
+    qr_code = generateQRCode(content)
+    qr_code.save(file_path, 'png')
+    return file_path
+
+# #Change to encode for customer ID
+# def encodeEmails(list):
+#     for attendee in list:
+#         qrcode = generateQRCode(attendee["Email"])
+#         qrcode.save(f'./codes/{attendee["First Name"]}QRCode', 'png')
+#         attendee["QR Code"] = f'{attendee["First Name"]}{attendee["Last Name"]}QRCode.png'
 
 #Create Customers with given merchant ID and token
 #implement retry after/exponential backoff. Will definitely hit rate limit in practice 
@@ -78,7 +85,7 @@ def createCustomer(fn='', ln='', email=''):
     max_attempts = 10
     attempts = 0
     response = ''
-    payload = { "firstName": fn, "lastName": ln, "marketingAllowed": False}
+    payload = {"firstName": fn, "lastName": ln, "marketingAllowed": False}
     # Retry attempts should max out after a reasonable number of attemps.
 
     while attempts < max_attempts:  
@@ -107,14 +114,18 @@ def createCustomer(fn='', ln='', email=''):
 
     return response.json()["id"]
 
+def createCustomers(list):
+    for attendee in list:
+        attendee["Customer ID"] = createCustomer(attendee["First Name"], attendee["Last Name"])
+        attendee["QR Code"] = saveQRCode(attendee["Customer ID"], uuid.uuid4().hex)
 
-attendees = parseContactList('Test Email List.csv')
-# createCustomers(attendees)
-print(createCustomer("Just looking", "For an ID"))
-# encodeEmails(attendees)
+
+attendees = parseContactList('MOCK_DATA.csv')
+createCustomers(attendees)
+
 
 for attendee in attendees:
-    print(f'\t{attendee["First Name"]} {attendee["Last Name"]}\'s email address is {attendee["Email"]}.')
+    print(f'\t{attendee["First Name"]} {attendee["Last Name"]}\'s Customer ID is {attendee["Customer ID"]}.')
     print(f'\t\t{attendee["First Name"]} {attendee["Last Name"]}\'s QR Code is located at {attendee["QR Code"]}')
 
 # with open('Test Email List.csv', mode='w') as target_csv:
