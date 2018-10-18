@@ -1,11 +1,14 @@
 import requests
 import logging
 import json
+import os
+import shutil
 
 env = 'https://apisandbox.dev.clover.com'
 mid = 'J96JE3HEHBDG1'
 token = input('Token pls: ')
 
+#delete customers
 def deleteCustomer(id):
     request_url = env + "/v3/merchants/" + mid + '/customers/' + id
     max_attempts = 10
@@ -36,12 +39,23 @@ def deleteCustomer(id):
         if(attempts >= max_attempts):
             logging.error('Failed: Maxed out attempts')
 
-request_url = env + "/v3/merchants/" + mid + '/customers'
+request_url = env + "/v3/merchants/" + mid + '/customers?limit=1000'
 
 r = requests.get(request_url, headers={'Authorization': 'Bearer ' + token})
 
 for customer in r.json()["elements"]:
     print("deleting customer id: " + customer["id"])
     deleteCustomer(customer["id"])
+
+
+#delete the QR codes
+folder = '../codes'
+for the_file in os.listdir(folder):
+    file_path = os.path.join(folder, the_file)
+    try:
+        if os.path.isfile(file_path):
+            os.unlink(file_path)
+    except Exception as e:
+        print(e)
 
 print("done!")
