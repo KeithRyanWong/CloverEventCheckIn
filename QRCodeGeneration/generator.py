@@ -73,9 +73,9 @@ def generateQRCode(content):
 
 #Make a QR code and save it with the passed in file name
 def saveQRCode(content, filename):
-    file_path = f'./codes/{filename}'
+    file_path = f'./codes/{filename}.png'
     qr_code = generateQRCode(content)
-    qr_code.save(file_path, 'png')
+    qr_code.save(file_path)
     return file_path
 
 #create a single customer. returns Customer ID        
