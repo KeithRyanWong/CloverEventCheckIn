@@ -31,6 +31,15 @@ token = ''
 def getToken():
     return input('Token pls: ')
 
+def getFile():
+    return input('File pls (must be in the same folder): ')
+
+token = getToken()
+env = 'https://apisandbox.dev.clover.com'
+mid = 'J96JE3HEHBDG1'
+file = getFile()
+
+#Takes a string and strips it of extraneous spaces and capitalizes each word
 def normalize(input):
     name = input.strip()
     name_parts = name.split(' ')
@@ -38,6 +47,7 @@ def normalize(input):
         name_parts[idx] = name_parts[idx].lower().capitalize()
     return ' '.join(name_parts)
 
+#Returns a list of dictionary objects from a CSV
 def parseContactList(list):
     parsed_list = []
 
@@ -56,28 +66,17 @@ def parseContactList(list):
 
     return parsed_list
 
+#Generate a QR code with the passed in content
 def generateQRCode(content):
     img = qrcode.make(content)
     return img
 
+#Make a QR code and save it with the passed in file name
 def saveQRCode(content, filename):
-    file_path = f'./codes/{filename}qrcode'
+    file_path = f'./codes/{filename}'
     qr_code = generateQRCode(content)
     qr_code.save(file_path, 'png')
     return file_path
-
-# #Change to encode for customer ID
-# def encodeEmails(list):
-#     for attendee in list:
-#         qrcode = generateQRCode(attendee["Email"])
-#         qrcode.save(f'./codes/{attendee["First Name"]}QRCode', 'png')
-#         attendee["QR Code"] = f'{attendee["First Name"]}{attendee["Last Name"]}QRCode.png'
-
-#Create Customers with given merchant ID and token
-#implement retry after/exponential backoff. Will definitely hit rate limit in practice 
-token = getToken()
-env = 'https://apisandbox.dev.clover.com'
-mid = 'J96JE3HEHBDG1'
 
 #create a single customer. returns Customer ID        
 def createCustomer(fn='', ln='', email=''):
@@ -117,22 +116,21 @@ def createCustomer(fn='', ln='', email=''):
 def createCustomers(list):
     for attendee in list:
         attendee["Customer ID"] = createCustomer(attendee["First Name"], attendee["Last Name"])
-        attendee["QR Code"] = saveQRCode(attendee["Customer ID"], uuid.uuid4().hex)
+        attendee["QR Code"] = saveQRCode(attendee["Customer ID"], attendee["Last Name"] + attendee["Customer ID"])
 
 
-attendees = parseContactList('MOCK_DATA.csv')
+attendees = parseContactList(file)
 createCustomers(attendees)
-
 
 for attendee in attendees:
     print(f'\t{attendee["First Name"]} {attendee["Last Name"]}\'s Customer ID is {attendee["Customer ID"]}.')
     print(f'\t\t{attendee["First Name"]} {attendee["Last Name"]}\'s QR Code is located at {attendee["QR Code"]}')
 
-# with open('Test Email List.csv', mode='w') as target_csv:
-#     field_names = ['Email', 'First Name', 'Last Name', 'QR Code']
-#     writer = csv.DictWriter(target_csv, field_names=fieldnames)
+with open(f'Final Copy of {file}', mode='w+') as target_csv:
+    field_names = ['First Name', 'Last Name', 'Email', 'Customer ID', 'QR Code']
+    writer = csv.DictWriter(target_csv, fieldnames=field_names)
 
-#     writer.writeheader()
-#     writer.writerow({'emp_name': 'John Smith', 'dept': 'Accounting', 'birth_month': 'November'})
-#     writer.writerow({'emp_name': 'Erica Meyers', 'dept': 'IT', 'birth_month': 'March'})
+    writer.writeheader()
+    for attendee in attendees:
+        writer.writerow({'First Name': attendee['First Name'], 'Last Name': attendee['Last Name'], 'Email': attendee['Email'], 'Customer ID': attendee['Customer ID'], 'QR Code': attendee['QR Code']})
 
