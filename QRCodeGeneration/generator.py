@@ -15,18 +15,6 @@ import uuid
 # prod_host = 'clover.com'
 # host = ''
 token = ''
-
-# env = input('What environment is this in? (sandbox/prod)')
-# choice = input('Is there a .csv you\'d like to import?')
-# csv_file = input('Where is it located?')
-# input('Please enter merchant email')
-# pwd = input('Please enter merchant password') 
-
-# def getURL(endpoint):
-#     if(host == 'sandbox'):
-#         return sandbox_host + endpoint
-#     :
-#     return prod_host + endpoint
     
 def getToken():
     return input('Token pls: ')
@@ -116,7 +104,7 @@ def createCustomer(fn='', ln='', email=''):
 def createCustomers(list):
     for attendee in list:
         attendee["Customer ID"] = createCustomer(attendee["First Name"], attendee["Last Name"])
-        attendee["QR Code"] = saveQRCode(attendee["Customer ID"], attendee["Last Name"] + attendee["Customer ID"])
+        attendee["QR Code"] = saveQRCode("Clover Check-in " + attendee["Customer ID"], attendee["Last Name"] + attendee["Customer ID"])
 
 
 attendees = parseContactList(file)
