@@ -5,4 +5,5 @@ package com.kwover.eventcheck_in.util;
  */
 
 public class CustomersAPIHelper {
+    public CustomersAPIHelper() {}
 }

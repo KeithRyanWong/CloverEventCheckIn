@@ -1,6 +1,8 @@
 package com.kwover.eventcheck_in.util;
 
 import java.util.Date;
+import java.util.List;
+
 import com.clover.sdk.v1.customer.*;
 import android.accounts.Account;
 import com.clover.sdk.util.CloverAccount;
@@ -10,6 +12,7 @@ import com.clover.sdk.util.CloverAccount;
 import android.content.Context;
 import android.database.sqlite.*;
 import android.os.AsyncTask;
+import android.util.Log;
 
 
 /**
@@ -25,23 +28,45 @@ public class Customers {
     private static Boolean isOpen = false;
     private Account account;
     private CustomerConnector connector;
+    private static final String TAG = "Customers";
 
-    public void openDb(Context context) {
-        dbHelper = new CustomersReaderDbHelper(context);
+//    private List<Customer> customers;
+
+    public Customers(){}
+
+    public static void openDb(Context context) {
+//        dbHelper = new CustomersReaderDbHelper(context);
         servHelper = new CustomersServiceHelper(context);
-        apiHelper = new apiHelper();
+//        apiHelper = new CustomersAPIHelper();
 
-        db = dbHelper.getWritableDatabase();
-        isOpen = true;
+//        db = dbHelper.getWritableDatabase();
+//        isOpen = true;
     }
 
-    public void syncDb() {
-        if(isOpen) {
+    public static void syncDb(Context context) {
+        servHelper.getCustomers(context, new CustomersCallbackInterface() {
+            @Override
+            public void onQueryFinished(List<Customer> customers) {
+                Log.i(TAG, "onQueryFinished: ");
+//                writeToDb(customers);
+                //Customers should be set to customers
+                //Then list should be parsed
+                //  and be written to the database via dbHelper
+                //  Keeping in mind that some entries may have just been updated
+            }
 
-        } else {
+            @Override
+            public void onUpdateFinished() {
+                Log.i(TAG, "onUpdateFinished: ");
+            }
+        });
 
-        }
     }
+
+    private void writeToDb(List<Customer> customers) {
+
+    }
+
     public boolean isOpen() {
         return db != null;
     }

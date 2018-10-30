@@ -3,6 +3,7 @@ package com.kwover.eventcheck_in.util;
 import android.accounts.Account;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.clover.sdk.util.CloverAccount;
 import com.clover.sdk.v1.ServiceConnector;
@@ -19,7 +20,8 @@ public class CustomersServiceHelper {
 
     private Account account;
     private CustomerConnector connector;
-    private List<Customers> customers;
+//    private List<Customer> customers;
+    public static final String TAG = "CustomersServiceHelper";
 
     public CustomersServiceHelper(Context context) {
         account = CloverAccount.getAccount(context);
@@ -27,6 +29,7 @@ public class CustomersServiceHelper {
 
     private void connect(Context context) {
         disconnect();
+        account = CloverAccount.getAccount(context);
         if(account != null) {
             connector = new CustomerConnector(context, account, null);
             connector.connect();
@@ -40,16 +43,29 @@ public class CustomersServiceHelper {
         }
     }
 
-    public void getCustomers() {
-        new AsyncTask<Void, Void, Customer>() {
+    public void getCustomers(Context context, CustomersCallbackInterface cb) {
+
+        final CustomersCallbackInterface callback = cb;
+        connect(context);
+
+        new AsyncTask<Void, Void, List<Customer>>() {
             @Override
-            protected Customer doInBackground(Void... voids) {
-                return null;
+            protected List<Customer> doInBackground(Void... voids) {
+                List<Customer> customers = null;
+                try {
+                    customers = connector.getCustomers();
+                } catch (Exception e) {
+                    Log.e(TAG, "doInBackground: Error getting customers through service", e);
+                    return null;
+                }
+                return customers;
             }
 
             @Override
-            protected void onPostExecute(Customer customer) {
-                super.onPostExecute(customer);
+            protected void onPostExecute(List<Customer> customers) {
+                super.onPostExecute(customers);
+                disconnect();
+                callback.onQueryFinished(customers);
             }
         }.execute();
     }
