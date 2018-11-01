@@ -20,8 +20,10 @@ public class CustomersServiceHelper {
 
     private Account account;
     private CustomerConnector connector;
-//    private List<Customer> customers;
+    private Boolean busy;
+
     public static final String TAG = "CustomersServiceHelper";
+
 
     public CustomersServiceHelper(Context context) {
         account = CloverAccount.getAccount(context);
@@ -43,10 +45,16 @@ public class CustomersServiceHelper {
         }
     }
 
+    public Boolean isBusy() {
+        return busy;
+    }
+
+
     public void getCustomers(Context context, CustomersCallbackInterface cb) {
 
         final CustomersCallbackInterface callback = cb;
         connect(context);
+        busy = true;
 
         new AsyncTask<Void, Void, List<Customer>>() {
             @Override
@@ -65,6 +73,7 @@ public class CustomersServiceHelper {
             protected void onPostExecute(List<Customer> customers) {
                 super.onPostExecute(customers);
                 disconnect();
+                busy = false;
                 callback.onQueryFinished(customers);
             }
         }.execute();

@@ -20,12 +20,12 @@ import android.util.Log;
  */
 
 public class Customers {
-    private static Date lastSynced = null;
-    private static SQLiteDatabase db = null;
-    private static CustomersReaderDbHelper dbHelper;
-    private static CustomersServiceHelper servHelper;
-    private static CustomersAPIHelper apiHelper;
-    private static Boolean isOpen = false;
+    private Date lastSynced = null;
+    private SQLiteDatabase db = null;
+    private CustomersReaderDbHelper dbHelper;
+    private CustomersServiceHelper servHelper;
+//    private static CustomersAPIHelper apiHelper;
+    private Boolean isOpen = false;
     private Account account;
     private CustomerConnector connector;
     private static final String TAG = "Customers";
@@ -34,7 +34,7 @@ public class Customers {
 
     public Customers(){}
 
-    public static void openDb(Context context) {
+    public void openDb(Context context) {
 //        dbHelper = new CustomersReaderDbHelper(context);
         servHelper = new CustomersServiceHelper(context);
 //        apiHelper = new CustomersAPIHelper();
@@ -43,16 +43,18 @@ public class Customers {
 //        isOpen = true;
     }
 
-    public static void syncDb(Context context) {
+    public void syncDb(final Context context, final ActivityCallbackInterface cb) {
         servHelper.getCustomers(context, new CustomersCallbackInterface() {
             @Override
             public void onQueryFinished(List<Customer> customers) {
-                Log.i(TAG, "onQueryFinished: ");
-//                writeToDb(customers);
-                //Customers should be set to customers
-                //Then list should be parsed
-                //  and be written to the database via dbHelper
-                //  Keeping in mind that some entries may have just been updated
+                if (customers == null) {
+                    cb.onSyncFinishBad();
+                    return;
+                } else {
+                    Log.i(TAG, "onQueryFinished: will write customers to db");
+                    writeToDb(customers);
+                    cb.onSyncFinishOk();
+                }
             }
 
             @Override
@@ -64,10 +66,32 @@ public class Customers {
     }
 
     private void writeToDb(List<Customer> customers) {
-
+        for(Customer customer : customers ) {
+            Log.d(TAG, "writeToDb: customer: " +
+                    customer.getFirstName() + " " +
+                    customer.getLastName() + ", cID: " +
+                    customer.getId() + ", marketing_Allowed: " +
+                    customer.getMarketingAllowed()
+            );
+//            try {
+//                Thread.sleep(6000);
+//            } catch (Exception e) {
+//
+//            }
+//            dbHelper.addRow(db,
+//                    customer.getFirstName(),
+//                    customer.getLastName(),
+//                    customer.getId(),
+//                    customer.getMarketingAllowed() ? 1 : 0
+//            );
+        }
     }
 
-    public boolean isOpen() {
+    public Boolean isSyncing () {
+        return servHelper.isBusy();
+    }
+
+    public Boolean isOpen() {
         return db != null;
     }
 
