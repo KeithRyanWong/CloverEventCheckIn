@@ -27,9 +27,9 @@ public class CustomersReaderDbHelper extends SQLiteOpenHelper{
             CustomerEntry._ID + " INTEGER PRIMARY KEY," +
             CustomerEntry.COLUMN_NAME_FIRST_NAME + " TEXT," +
             CustomerEntry.COLUMN_NAME_LAST_NAME + " TEXT," +
-            CustomerEntry.COLUMN_NAME_CUSTOMER_ID + " TEXT," +
-            CustomerEntry.COLUMN_NAME_MARKETING_ALLOWED + " INTEGER," +
-            CustomerEntry.COLUMN_NAME_SYNCED + " INTEGER)";
+            CustomerEntry.COLUMN_NAME_CUSTOMER_ID + " TEXT NOT NULL UNIQUE," +
+            CustomerEntry.COLUMN_NAME_MARKETING_ALLOWED + " INTEGER NOT NULL," +
+            CustomerEntry.COLUMN_NAME_SYNCED + " INTEGER DEFAULT 1)";
 
 //    private static final String SQL_Create_Index = "CREATE UNIQUE INDEX customer_customer_ids ON " +
 //            CustomerEntry.TABLE_NAME + " (" +
@@ -56,14 +56,22 @@ public class CustomersReaderDbHelper extends SQLiteOpenHelper{
     }
 
     public void addRow(SQLiteDatabase db, String fn, String ln, String c_id, Integer m_allowed) {
+        // Will strings inserted into clause be okay?
+        final String WHERE_CLAUSE =
+                CustomerEntry.COLUMN_NAME_CUSTOMER_ID + " = ? AND " +
+                CustomerEntry.COLUMN_NAME_SYNCED + " = 1";
+
         ContentValues vals = new ContentValues();
         vals.put(CustomerEntry.COLUMN_NAME_FIRST_NAME, fn);
         vals.put(CustomerEntry.COLUMN_NAME_LAST_NAME, ln);
         vals.put(CustomerEntry.COLUMN_NAME_CUSTOMER_ID, c_id);
         vals.put(CustomerEntry.COLUMN_NAME_MARKETING_ALLOWED, m_allowed);
-        vals.put(CustomerEntry.COLUMN_NAME_SYNCED, 0);
 
-        db.insert(CustomerEntry.TABLE_NAME, null, vals);
+        //If values are new, a new row will be added
+        //  Otherwise a conflict will be risen via the unique customer key and row will be skipped
+        db.insertWithOnConflict(CustomerEntry.TABLE_NAME, null, vals, SQLiteDatabase.CONFLICT_IGNORE);
+        //Entry with customer_id will be updated only if it is marked as synced
+        db.updateWithOnConflict(CustomerEntry.TABLE_NAME, vals, WHERE_CLAUSE, new String[]{c_id}, SQLiteDatabase.CONFLICT_NONE);
     }
 
 }

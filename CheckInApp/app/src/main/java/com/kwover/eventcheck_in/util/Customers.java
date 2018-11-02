@@ -35,12 +35,12 @@ public class Customers {
     public Customers(){}
 
     public void openDb(Context context) {
-//        dbHelper = new CustomersReaderDbHelper(context);
+        dbHelper = new CustomersReaderDbHelper(context);
         servHelper = new CustomersServiceHelper(context);
 //        apiHelper = new CustomersAPIHelper();
 
-//        db = dbHelper.getWritableDatabase();
-//        isOpen = true;
+        db = dbHelper.getWritableDatabase();
+        isOpen = true;
     }
 
     public void syncDb(final Context context, final ActivityCallbackInterface cb) {
@@ -73,17 +73,13 @@ public class Customers {
                     customer.getId() + ", marketing_Allowed: " +
                     customer.getMarketingAllowed()
             );
-//            try {
-//                Thread.sleep(6000);
-//            } catch (Exception e) {
-//
-//            }
-//            dbHelper.addRow(db,
-//                    customer.getFirstName(),
-//                    customer.getLastName(),
-//                    customer.getId(),
-//                    customer.getMarketingAllowed() ? 1 : 0
-//            );
+
+            dbHelper.addRow(db,
+                    customer.getFirstName(),
+                    customer.getLastName(),
+                    customer.getId(),
+                    customer.getMarketingAllowed() ? 1 : 0
+            );
         }
     }
 
