@@ -63,7 +63,7 @@ public class CustomersServiceHelper {
                 try {
                     customers = connector.getCustomers();
                 } catch (Exception e) {
-                    Log.e(TAG, "doInBackground: Error getting customers through service", e);
+                    Log.e(TAG, "getCustomers: Error getting customers through service", e);
                     return null;
                 }
                 return customers;
@@ -79,7 +79,34 @@ public class CustomersServiceHelper {
         }.execute();
     }
 
-    public void updateCustomer(Customer customer) {
+    public void updateCustomer(Context context, Customer c, CustomersCallbackInterface cb) {
+        final CustomersCallbackInterface callback = cb;
+        final Customer customer = c;
+        if(connector == null) {
+            connect(context);
+        }
+        busy = true;
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                try {
+                    connector.setMarketingAllowed(customer.getId(), true);
+                } catch (Exception e) {
+                    Log.e(TAG, "updateCustomer.doInBackground: Error updating Customers through Service", e);
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                disconnect();
+                busy = false;
+                callback.onUpdateFinished();
+            }
+        }.execute();
 
     }
 }

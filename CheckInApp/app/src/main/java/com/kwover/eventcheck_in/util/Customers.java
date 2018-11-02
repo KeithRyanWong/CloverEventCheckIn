@@ -59,10 +59,28 @@ public class Customers {
 
             @Override
             public void onUpdateFinished() {
-                Log.i(TAG, "onUpdateFinished: ");
+
             }
         });
 
+    }
+
+    public void markCustomerAttended(final Context context, String customer_Id, final ActivityCallbackInterface cb) {
+        //Try to update customers in DB first
+        //Then try to update via the service/api
+        dbHelper.updateRowByCustomerId(db, customer_Id, null, null, 1);
+
+//        servHelper.updateCustomer(context, customer_Id, new CustomersCallbackInterface() {
+//            @Override
+//            public void onQueryFinished(List<Customer> customers) {
+//
+//            }
+//
+//            @Override
+//            public void onUpdateFinished() {
+//                cb.onUpdateFinished();
+//            }
+//        });
     }
 
     private void writeToDb(List<Customer> customers) {

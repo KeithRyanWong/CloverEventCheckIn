@@ -74,4 +74,23 @@ public class CustomersReaderDbHelper extends SQLiteOpenHelper{
         db.updateWithOnConflict(CustomerEntry.TABLE_NAME, vals, WHERE_CLAUSE, new String[]{c_id}, SQLiteDatabase.CONFLICT_NONE);
     }
 
+    public void updateRowByCustomerId(SQLiteDatabase db, String c_id, String fn, String ln, Integer m_allowed) {
+        final String WHERE_CLAUSE =
+                CustomerEntry.COLUMN_NAME_CUSTOMER_ID + " = ?";
+
+        ContentValues vals = new ContentValues();
+        if(fn != null) {
+            vals.put(CustomerEntry.COLUMN_NAME_FIRST_NAME, fn);
+        }
+        if(ln != null) {
+            vals.put(CustomerEntry.COLUMN_NAME_LAST_NAME, ln);
+        }
+        if(m_allowed != null) {
+            vals.put(CustomerEntry.COLUMN_NAME_MARKETING_ALLOWED, m_allowed);
+        }
+        vals.put(CustomerEntry.COLUMN_NAME_SYNCED, 0);
+
+        db.update(CustomerEntry.TABLE_NAME, vals, WHERE_CLAUSE, new String[]{c_id});
+    }
+
 }
