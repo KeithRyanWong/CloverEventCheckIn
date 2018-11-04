@@ -102,11 +102,11 @@ public class StartupActivity extends AppCompatActivity {
                     @Override
                     public void onSyncFinishBad() {
                         //transition to error message
-                        Log.e(TAG, "onSyncFinishBad: Nothing was returned from the DB");
+                        Log.e(TAG, "onSyncFinishBad: There was an error grabbing data from the server");
                     }
 
                     @Override
-                    public void onUpdateFinished() {
+                    public void onUpdateFinished(Boolean finishedOk) {
 
                     }
                 }
@@ -114,8 +114,8 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
+        super.onPause();
         customers.closeConnection();
     }
 
@@ -124,10 +124,10 @@ public class StartupActivity extends AppCompatActivity {
         startBarcodeScanner();
     }
 
-    private void markCustomerAttended(final String Customer_Id) {
+    private void markCustomerAttended(final String customerId) {
         final Context context = this;
 
-        customers.markCustomerAttended(context, Customer_Id , new ActivityCallbackInterface() {
+        customers.markCustomerAttended(context, customerId , new ActivityCallbackInterface() {
             @Override
             public void onSyncFinishOk() {
                 return;
@@ -139,14 +139,18 @@ public class StartupActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onUpdateFinished() {
+            public void onUpdateFinished(Boolean finishedOk) {
                 //Transition to customer checked in message
-                Log.i(TAG, "onUpdateFinished: Check the db");
+                if (finishedOk) {
+                    Log.i(TAG, "onUpdateFinished: Finished syncing " + customerId + ".");
+                } else {
+                    Log.i(TAG, "onUpdateFinished: Error syncing " + customerId + " through Customers Service.");
+                }
                 return;
             }
         });
 
-        customers.closeConnection();
+//        customers.closeConnection();
     }
 
 
@@ -160,7 +164,7 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     public boolean startBarcodeScanner() {
-        new BarcodeScanner(this).startScan(getBarcodeSetting(true));
+        return new BarcodeScanner(this).startScan(getBarcodeSetting(true));
 
 //        try {
 //            Thread.sleep(5000);
@@ -175,7 +179,7 @@ public class StartupActivity extends AppCompatActivity {
 //            return false;
 //        }
 
-        return true;
+//        return true;
     }
 
     public boolean stopBarcodeScanner() {
@@ -193,7 +197,7 @@ public class StartupActivity extends AppCompatActivity {
 
                     //Extract Customer ID from QR Code text
 
-                    markCustomerAttended("E1XV51JYVST4C");
+                    markCustomerAttended("0W1GJWGK8MJRA");
                     Log.i(TAG, "Scanned entity: " + scannedBarcode);
                 }
             }

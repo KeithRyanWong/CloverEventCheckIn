@@ -20,7 +20,7 @@ import android.util.Log;
  */
 
 public class Customers {
-    private Date lastSynced = null;
+//    private Date lastSynced = null;
     private SQLiteDatabase db = null;
     private CustomersReaderDbHelper dbHelper;
     private CustomersServiceHelper servHelper;
@@ -58,29 +58,32 @@ public class Customers {
             }
 
             @Override
-            public void onUpdateFinished() {
+            public void onUpdateFinished(Boolean result) {
 
             }
         });
 
     }
 
-    public void markCustomerAttended(final Context context, String customer_Id, final ActivityCallbackInterface cb) {
+    public void markCustomerAttended(final Context context, final String customer_Id, final ActivityCallbackInterface cb) {
         //Try to update customers in DB first
         //Then try to update via the service/api
-        dbHelper.updateRowByCustomerId(db, customer_Id, null, null, 1);
+        dbHelper.updateRowByCustomerId(db, customer_Id, null, null, 1, 0);
 
-//        servHelper.updateCustomer(context, customer_Id, new CustomersCallbackInterface() {
-//            @Override
-//            public void onQueryFinished(List<Customer> customers) {
-//
-//            }
-//
-//            @Override
-//            public void onUpdateFinished() {
-//                cb.onUpdateFinished();
-//            }
-//        });
+        servHelper.updateCustomer(context, customer_Id, new CustomersCallbackInterface() {
+            @Override
+            public void onQueryFinished(List<Customer> customers) {
+
+            }
+
+            @Override
+            public void onUpdateFinished(Boolean finishedOk) {
+                if (finishedOk) {
+                    dbHelper.updateRowByCustomerId(db, customer_Id, null, null, null, 1);
+                }
+                cb.onUpdateFinished(finishedOk);
+            }
+        });
     }
 
     private void writeToDb(List<Customer> customers) {

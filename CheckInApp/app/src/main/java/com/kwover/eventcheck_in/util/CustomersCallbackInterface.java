@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface CustomersCallbackInterface {
     void onQueryFinished(List<Customer> customers);
-    void onUpdateFinished();
+    void onUpdateFinished(Boolean finishedOk);
 }

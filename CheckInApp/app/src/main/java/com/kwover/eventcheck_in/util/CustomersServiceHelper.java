@@ -79,32 +79,34 @@ public class CustomersServiceHelper {
         }.execute();
     }
 
-    public void updateCustomer(Context context, Customer c, CustomersCallbackInterface cb) {
+    public void updateCustomer(Context context, String id, CustomersCallbackInterface cb) {
         final CustomersCallbackInterface callback = cb;
-        final Customer customer = c;
+//        final Customer customer = c;
+        final String customer_id = id;
         if(connector == null) {
             connect(context);
         }
         busy = true;
 
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            protected Boolean doInBackground(Void... voids) {
                 try {
-                    connector.setMarketingAllowed(customer.getId(), true);
+                    connector.setMarketingAllowed(customer_id, true);
                 } catch (Exception e) {
                     Log.e(TAG, "updateCustomer.doInBackground: Error updating Customers through Service", e);
+                    return false;
                 }
-                return null;
+
+                return true;
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
                 disconnect();
                 busy = false;
-                callback.onUpdateFinished();
+                callback.onUpdateFinished(aBoolean);
             }
         }.execute();
 
