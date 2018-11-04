@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -22,8 +23,18 @@ public class StartupActivity extends AppCompatActivity {
     protected Customers customers;
     private static final String BARCODE_BROADCAST = "com.clover.BarcodeBroadcast";
     private String scannedBarcode;
+    private BarcodeReceiver barcodeReceiver;
 
     private static final String TAG = "Startup Activity";
+
+    private ProgressBar loadBar;
+    private TextView loadMsg;
+    private TextView tip1Txt;
+    private TextView warningMsg;
+    private TextView welcomeMsg;
+    private Button startScanBtn;
+    private Button acknowledgeErrorBtn;
+
 
 //    When app is started:
 //    check for existence of internal customers db
@@ -36,9 +47,16 @@ public class StartupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
+        loadBar = (ProgressBar) findViewById(R.id.loading_bar);
+        loadMsg = (TextView) findViewById(R.id.loading_message);
+        tip1Txt = (TextView) findViewById(R.id.tip1);
+        startScanBtn = (Button) findViewById(R.id.startScan);
+        acknowledgeErrorBtn = (Button) findViewById(R.id.acknowledgementBtn);
+        warningMsg = (TextView) findViewById(R.id.warningMsg);
+        welcomeMsg = (TextView) findViewById(R.id.welcomeMsg);
 
         customers = new Customers();
-        registerReceiver(new BarcodeReceiver(), new IntentFilter(BARCODE_BROADCAST));
+
 
 
 
@@ -79,8 +97,36 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i(TAG, "onStart: RP)*#H(*RH@#( %(Y@#(*Y%(H@$IURHTKUEWHFIEGHRF(H Q(*(*#@Y RIHKUEFHIUPQGF*IGQIEWGFI QWG(F(*@#(Y@*5F4W68R460Q @W3210@6!54 R6840Q@#6540R 86#Q4R60QW");
+        
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+
+
+        barcodeReceiver = new BarcodeReceiver();
+
+        registerReceiver(barcodeReceiver, new IntentFilter(BARCODE_BROADCAST));
+
+        startScanBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startScanForQR();
+            }
+        });
+
+        acknowledgeErrorBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                transitionToMain();
+            }
+        });
+
+
 
         final Context context = this;
 
@@ -89,24 +135,25 @@ public class StartupActivity extends AppCompatActivity {
                     @Override
                     public void onSyncFinishOk() {
                         //Remove loading bar and message
-                        ProgressBar load_bar = (ProgressBar) findViewById(R.id.loading_bar);
-                        TextView load_msg = (TextView) findViewById(R.id.loading_message);
-
-                        load_bar.setVisibility(View.INVISIBLE);
-                        load_msg.setVisibility(View.INVISIBLE);
+//                        ProgressBar load_bar = (ProgressBar) findViewById(R.id.loading_bar);
+//                        TextView load_msg = (TextView) findViewById(R.id.loading_message);
+//
+//                        load_bar.setVisibility(View.INVISIBLE);
+//                        load_msg.setVisibility(View.INVISIBLE);
                         //transition to check in activity
-
-                        startScanForQR();
+                        transitionToMain();
+//                        startScanForQR();
                     }
 
                     @Override
                     public void onSyncFinishBad() {
                         //transition to error message
                         Log.e(TAG, "onSyncFinishBad: There was an error grabbing data from the server");
+                        transitionToError("Se encontró un error al intentar conectarse al servidor. Procediendo sin conexión");
                     }
 
                     @Override
-                    public void onUpdateFinished(Boolean finishedOk) {
+                    public void onUpdateFinished(Boolean finishedOk, String[] customerName) {
 
                     }
                 }
@@ -116,7 +163,9 @@ public class StartupActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        Log.i(TAG, "onPause: Closing DB and unregistering broadcast receiver.");
         customers.closeConnection();
+        unregisterReceiver(barcodeReceiver);
     }
 
     private void startScanForQR() {
@@ -139,20 +188,70 @@ public class StartupActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onUpdateFinished(Boolean finishedOk) {
+            public void onUpdateFinished(Boolean finishedOk, String[] customerName) {
                 //Transition to customer checked in message
                 if (finishedOk) {
                     Log.i(TAG, "onUpdateFinished: Finished syncing " + customerId + ".");
+                    transitionToCheckedIn(customerName);
                 } else {
                     Log.i(TAG, "onUpdateFinished: Error syncing " + customerId + " through Customers Service.");
                 }
                 return;
             }
         });
-
-//        customers.closeConnection();
+        
     }
 
+    private void transitionToMain() {
+        loadBar.setVisibility(View.GONE);
+        loadMsg.setVisibility(View.GONE);
+        welcomeMsg.setVisibility(View.GONE);
+
+        acknowledgeErrorBtn.setVisibility(View.GONE);
+        warningMsg.setVisibility(View.GONE);
+
+        //set button to start scan visible
+        tip1Txt.setVisibility(View.VISIBLE);
+        startScanBtn.setVisibility(View.VISIBLE);
+
+//        transitionToCheckedIn(new String[]{"KEITH", "WONG"});
+    }
+
+    private void transitionToError(String errMsg) {
+        loadBar.setVisibility(View.GONE);
+        loadMsg.setVisibility(View.GONE);
+        tip1Txt.setVisibility(View.GONE);
+        startScanBtn.setVisibility(View.GONE);
+        welcomeMsg.setVisibility(View.GONE);
+
+        //set button to start transition to main screen
+        acknowledgeErrorBtn.setVisibility(View.VISIBLE);
+        warningMsg.setText(errMsg);
+        warningMsg.setVisibility(View.VISIBLE);
+    }
+
+    private void transitionToCheckedIn(String[] customerName) {
+        loadBar.setVisibility(View.GONE);
+        loadMsg.setVisibility(View.GONE);
+        tip1Txt.setVisibility(View.GONE);
+        startScanBtn.setVisibility(View.GONE);
+        acknowledgeErrorBtn.setVisibility(View.GONE);
+        warningMsg.setVisibility(View.GONE);
+
+        String msg = "El huésped ha sido registrado. Por favor salude al " +
+                customerName[0] + " " +
+                customerName[1] + ".";
+
+        welcomeMsg.setText(msg);
+        welcomeMsg.setVisibility(View.VISIBLE);
+
+        try {
+            Thread.sleep(10000);
+            transitionToMain();
+        } catch (Exception e) {
+            transitionToError("Se encontró un error. Procediendo");
+        }
+    }
 
     private static Bundle getBarcodeSetting(final boolean enabled) {
         final Bundle extras = new Bundle();

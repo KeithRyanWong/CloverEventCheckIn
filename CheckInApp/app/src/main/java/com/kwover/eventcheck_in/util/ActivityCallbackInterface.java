@@ -9,5 +9,5 @@ import android.content.Context;
 public interface ActivityCallbackInterface {
     void onSyncFinishOk();
     void onSyncFinishBad();
-    void onUpdateFinished(Boolean finishedOk);
+    void onUpdateFinished(Boolean finishedOk, String[] customerName);
 }

@@ -2,6 +2,7 @@ package com.kwover.eventcheck_in.util;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
@@ -75,8 +76,7 @@ public class CustomersReaderDbHelper extends SQLiteOpenHelper{
     }
 
     public void updateRowByCustomerId(SQLiteDatabase db, String c_id, String fn, String ln, Integer m_allowed, Integer synced) {
-        final String WHERE_CLAUSE =
-                CustomerEntry.COLUMN_NAME_CUSTOMER_ID + " = ?";
+        final String WHERE_CLAUSE = CustomerEntry.COLUMN_NAME_CUSTOMER_ID + " = ?";
 
         ContentValues vals = new ContentValues();
         if(fn != null) {
@@ -95,4 +95,24 @@ public class CustomersReaderDbHelper extends SQLiteOpenHelper{
         db.update(CustomerEntry.TABLE_NAME, vals, WHERE_CLAUSE, new String[]{c_id});
     }
 
+    public String[] fetchFullName(SQLiteDatabase db, String c_id) {
+        String[] cols = new String[]{CustomerEntry.COLUMN_NAME_FIRST_NAME, CustomerEntry.COLUMN_NAME_LAST_NAME};
+        final String WHERE_CLAUSE = CustomerEntry.COLUMN_NAME_CUSTOMER_ID + " = ?";
+        String[] customerName = new String[2];
+
+        Cursor cursor = db.query(CustomerEntry.TABLE_NAME, cols, WHERE_CLAUSE, new String[]{c_id}, null, null, null, null);
+        cursor.moveToFirst();
+
+        String[] columns = cursor.getColumnNames();
+
+        for (int i = 0; i < columns.length; i++) {
+            if(columns[i].equals(CustomerEntry.COLUMN_NAME_FIRST_NAME)) {
+                customerName[0] = cursor.getString(i);
+            } else if (columns[i].equals(CustomerEntry.COLUMN_NAME_LAST_NAME)) {
+                customerName[1] = cursor.getString(i);
+            }
+        }
+
+        return customerName;
+    }
 }

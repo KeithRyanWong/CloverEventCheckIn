@@ -26,8 +26,8 @@ public class Customers {
     private CustomersServiceHelper servHelper;
 //    private static CustomersAPIHelper apiHelper;
     private Boolean isOpen = false;
-    private Account account;
-    private CustomerConnector connector;
+//    private Account account;
+//    private CustomerConnector connector;
     private static final String TAG = "Customers";
 
 //    private List<Customer> customers;
@@ -70,6 +70,8 @@ public class Customers {
         //Then try to update via the service/api
         dbHelper.updateRowByCustomerId(db, customer_Id, null, null, 1, 0);
 
+        final String[] customerName = dbHelper.fetchFullName(db, customer_Id);
+
         servHelper.updateCustomer(context, customer_Id, new CustomersCallbackInterface() {
             @Override
             public void onQueryFinished(List<Customer> customers) {
@@ -81,7 +83,7 @@ public class Customers {
                 if (finishedOk) {
                     dbHelper.updateRowByCustomerId(db, customer_Id, null, null, null, 1);
                 }
-                cb.onUpdateFinished(finishedOk);
+                cb.onUpdateFinished(finishedOk, customerName);
             }
         });
     }
