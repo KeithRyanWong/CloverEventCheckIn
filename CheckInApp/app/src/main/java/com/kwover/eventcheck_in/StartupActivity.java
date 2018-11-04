@@ -193,12 +193,11 @@ public class StartupActivity extends AppCompatActivity {
             if (action.equals(BARCODE_BROADCAST)) {
                 String barcode = intent.getStringExtra("Barcode");
                 if (barcode != null) {
-                    scannedBarcode = barcode;
-
-                    //Extract Customer ID from QR Code text
-
-                    markCustomerAttended("0W1GJWGK8MJRA");
-                    Log.i(TAG, "Scanned entity: " + scannedBarcode);
+                    scannedBarcode = barcode.trim();
+                    if (scannedBarcode.startsWith("CloverEventCheck-in.")) {
+                        Log.i(TAG, "Scanned entity: " + scannedBarcode.substring(20));
+                        markCustomerAttended(scannedBarcode.substring(20));
+                    }
                 }
             }
         }
