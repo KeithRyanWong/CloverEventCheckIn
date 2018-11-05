@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -46,6 +48,8 @@ public class StartupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        
         setContentView(R.layout.activity_startup);
         loadBar = (ProgressBar) findViewById(R.id.loading_bar);
         loadMsg = (TextView) findViewById(R.id.loading_message);
@@ -56,61 +60,6 @@ public class StartupActivity extends AppCompatActivity {
         welcomeMsg = (TextView) findViewById(R.id.welcomeMsg);
 
         customers = new Customers();
-
-
-
-
-
-//        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.startTest);
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                customers.openDb(context);
-//                customers.syncDb(context, new ActivityCallbackInterface() {
-//                    @Override
-//                    public void onSyncFinishOk() {
-//                        //transition to check in activity
-//                    }
-//
-//                    @Override
-//                    public void onSyncFinishBad() {
-//                        //transition to error message
-//                    }
-//                });
-//            }
-//        });
-
-
-        //Show spinner
-        //
-
-
-//
-//        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.startTest);
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Customers.openDb(context);
-//                Customers.syncDb(context);
-//            }
-//        });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.i(TAG, "onStart: RP)*#H(*RH@#( %(Y@#(*Y%(H@$IURHTKUEWHFIEGHRF(H Q(*(*#@Y RIHKUEFHIUPQGF*IGQIEWGFI QWG(F(*@#(Y@*5F4W68R460Q @W3210@6!54 R6840Q@#6540R 86#Q4R60QW");
-        
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-
-        barcodeReceiver = new BarcodeReceiver();
-
-        registerReceiver(barcodeReceiver, new IntentFilter(BARCODE_BROADCAST));
 
         startScanBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,8 +75,6 @@ public class StartupActivity extends AppCompatActivity {
             }
         });
 
-
-
         final Context context = this;
 
         customers.openDb(context);
@@ -135,14 +82,8 @@ public class StartupActivity extends AppCompatActivity {
                     @Override
                     public void onSyncFinishOk() {
                         //Remove loading bar and message
-//                        ProgressBar load_bar = (ProgressBar) findViewById(R.id.loading_bar);
-//                        TextView load_msg = (TextView) findViewById(R.id.loading_message);
-//
-//                        load_bar.setVisibility(View.INVISIBLE);
-//                        load_msg.setVisibility(View.INVISIBLE);
                         //transition to check in activity
                         transitionToMain();
-//                        startScanForQR();
                     }
 
                     @Override
@@ -161,11 +102,80 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i(TAG, "onStart: RP)*#H(*RH@#( %(Y@#(*Y%(H@$IURHTKUEWHFIEGHRF(H Q(*(*#@Y RIHKUEFHIUPQGF*IGQIEWGFI QWG(F(*@#(Y@*5F4W68R460Q @W3210@6!54 R6840Q@#6540R 86#Q4R60QW");
+        
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+        barcodeReceiver = new BarcodeReceiver();
+
+        registerReceiver(barcodeReceiver, new IntentFilter(BARCODE_BROADCAST));
+
+//        startScanBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startScanForQR();
+//            }
+//        });
+//
+//        acknowledgeErrorBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                transitionToMain();
+//            }
+//        });
+
+
+
+//        final Context context = this;
+//
+//        customers.openDb(context);
+//        customers.syncDb(context, new ActivityCallbackInterface() {
+//                    @Override
+//                    public void onSyncFinishOk() {
+//                        //Remove loading bar and message
+////                        ProgressBar load_bar = (ProgressBar) findViewById(R.id.loading_bar);
+////                        TextView load_msg = (TextView) findViewById(R.id.loading_message);
+////
+////                        load_bar.setVisibility(View.INVISIBLE);
+////                        load_msg.setVisibility(View.INVISIBLE);
+//                        //transition to check in activity
+//                        transitionToMain();
+////                        startScanForQR();
+//                    }
+//
+//                    @Override
+//                    public void onSyncFinishBad() {
+//                        //transition to error message
+//                        Log.e(TAG, "onSyncFinishBad: There was an error grabbing data from the server");
+//                        transitionToError("Se encontró un error al intentar conectarse al servidor. Procediendo sin conexión");
+//                    }
+//
+//                    @Override
+//                    public void onUpdateFinished(Boolean finishedOk, String[] customerName) {
+//
+//                    }
+//                }
+//        );
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         Log.i(TAG, "onPause: Closing DB and unregistering broadcast receiver.");
         customers.closeConnection();
         unregisterReceiver(barcodeReceiver);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     private void startScanForQR() {
@@ -245,12 +255,17 @@ public class StartupActivity extends AppCompatActivity {
         welcomeMsg.setText(msg);
         welcomeMsg.setVisibility(View.VISIBLE);
 
-        try {
-            Thread.sleep(10000);
-            transitionToMain();
-        } catch (Exception e) {
-            transitionToError("Se encontró un error. Procediendo");
-        }
+        new CountDownTimer(5000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                transitionToMain();
+            }
+        }.start();
     }
 
     private static Bundle getBarcodeSetting(final boolean enabled) {
