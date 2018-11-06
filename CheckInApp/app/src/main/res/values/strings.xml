@@ -5,8 +5,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="loading_message">Syncing guest list with the server</string>
-    <string name="tip1">Presione el botón en este lado en caso de que esté atascado en la pantalla del escáner</string>
+    <string name="tip1">Haga clic en el botón gris de Flex si se queda atascado escaneando.</string>
     <string name="startScan">Escanear</string>
     <string name="acknowledgement">Proceder</string>
     <string name="warning">Se encontró un error al intentar conectarse al servidor. Procediendo sin conexión</string>
+    <string name="logoText">Clover Event Check-in</string>
 </resources>

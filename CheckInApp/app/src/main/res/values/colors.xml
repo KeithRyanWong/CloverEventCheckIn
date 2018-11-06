@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimaryDark">#303f9f</color>
+    <color name="colorAccent">#ff4081</color>
+    <color name="clover_gray">#63666a</color>
+    <color name="clover_blue">#00a9e0</color>
+    <color name="clover_green">#43b02a</color>
+    <color name="tip_text">#e7767678</color>
 </resources>

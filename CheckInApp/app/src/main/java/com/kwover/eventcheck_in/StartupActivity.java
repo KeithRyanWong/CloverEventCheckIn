@@ -210,14 +210,10 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     private void transitionToCheckedIn(String[] customerName) {
-//        loadBar.setVisibility(View.GONE);
-//        loadMsg.setVisibility(View.GONE);
-//        tip1Txt.setVisibility(View.GONE);
-//        startScanBtn.setVisibility(View.GONE);
-//        acknowledgeErrorBtn.setVisibility(View.GONE);
-//        warningMsg.setVisibility(View.GONE);
-
-        String msg = "El huésped ha sido registrado. Por favor salude al " +
+        String msg = "The guest has been checked in. Please give your welcome to " +
+                customerName[0] + " " +
+                customerName[1] + "." +
+                "\n\n" + "El huésped ha sido registrado. Por favor salude al " +
                 customerName[0] + " " +
                 customerName[1] + ".";
 
@@ -242,6 +238,8 @@ public class StartupActivity extends AppCompatActivity {
         extras.putBoolean(Intents.EXTRA_START_SCAN, enabled);
         extras.putBoolean(Intents.EXTRA_SHOW_PREVIEW, enabled);
         extras.putBoolean(Intents.EXTRA_SHOW_MERCHANT_PREVIEW, enabled);
+        extras.putBoolean(Intents.EXTRA_SHOW_CLOSE_BUTTON, enabled);
+        extras.putBoolean(Intents.EXTRA_SHOW_LED_BUTTON, enabled);
         extras.putBoolean(Intents.EXTRA_LED_ON, false);
         return extras;
     }
