@@ -35,7 +35,9 @@ public class StartupActivity extends AppCompatActivity {
 //    private TextView tip1Txt;
     private TextView warningMsg;
     private TextView welcomeMsg;
+//    private TextView welcomeMsg2;
     private Button startScanBtn;
+    private Button okBtn;
     private Button acknowledgeErrorBtn;
     private ConstraintLayout loadingView;
     private ConstraintLayout mainView;
@@ -66,8 +68,10 @@ public class StartupActivity extends AppCompatActivity {
 //        tip1Txt = (TextView) findViewById(R.id.tip1);
         startScanBtn = findViewById(R.id.startScan);
         acknowledgeErrorBtn = findViewById(R.id.acknowledgementBtn);
+        okBtn = findViewById(R.id.ok);
         warningMsg = findViewById(R.id.warningMsg);
         welcomeMsg = findViewById(R.id.welcomeMsg);
+//        welcomeMsg2 = findViewById(R.id.welcomeMsg2);
         loadingView = findViewById(R.id.loadingView);
         mainView = findViewById(R.id.mainView);
         errorView = findViewById(R.id.errorView);
@@ -88,6 +92,13 @@ public class StartupActivity extends AppCompatActivity {
         });
 
         acknowledgeErrorBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                transitionToMain();
+            }
+        });
+
+        okBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 transitionToMain();
@@ -210,27 +221,40 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     private void transitionToCheckedIn(String[] customerName) {
-        String msg = "The guest has been checked in. Please give your welcome to " +
-                customerName[0] + " " +
-                customerName[1] + "." +
-                "\n\n" + "El huésped ha sido registrado. Por favor salude al " +
-                customerName[0] + " " +
-                customerName[1] + ".";
+
+//        String msg = "El huésped ha sido registrado. Por favor salude al " +
+//                customerName[0] + " " +
+//                customerName[1] + ".";
+//
+//        String msg2 = "The guest has been checked in. Please give your welcome to " +
+//                customerName[0] + " " +
+//                customerName[1] + ".";
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < customerName.length; i++) {
+            if(i == 1) {
+                builder.append(" ");
+            }
+            builder.append(customerName[i]);
+        }
+
+        String customer = builder.toString();
 
         toggleVisibleView(WELCOME_VIEW);
-        welcomeMsg.setText(msg);
+        welcomeMsg.setText(customer);
+//        welcomeMsg2.setText(msg2);
 
-        new CountDownTimer(5000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-
-            }
-
-            @Override
-            public void onFinish() {
-                transitionToMain();
-            }
-        }.start();
+//        new CountDownTimer(8000, 1000) {
+//            @Override
+//            public void onTick(long millisUntilFinished) {
+//
+//            }
+//
+//            @Override
+//            public void onFinish() {
+//                transitionToMain();
+//            }
+//        }.start();
     }
 
     private static Bundle getBarcodeSetting(final boolean enabled) {
