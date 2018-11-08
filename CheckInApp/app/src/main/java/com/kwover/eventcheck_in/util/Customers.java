@@ -88,6 +88,33 @@ public class Customers {
         });
     }
 
+    public void resolveUnsyncedCustomers(final Context context) {
+        List<String> customerIds = dbHelper.fetchUnsyncedEntries(db);
+
+        if(customerIds != null) {
+//            submit the customers through service
+//            mark them synced
+            for (String customerId : customerIds) {
+                markCustomerAttended(context, customerId, new ActivityCallbackInterface() {
+                    @Override
+                    public void onSyncFinishOk() {
+
+                    }
+
+                    @Override
+                    public void onSyncFinishBad() {
+
+                    }
+
+                    @Override
+                    public void onUpdateFinished(Boolean finishedOk, String[] customerName) {
+                        Log.i(TAG, "onUpdateFinished: synced " + customerName[0] + " " + customerName[1]);
+                    }
+                });
+            }
+        }
+    }
+
     private void writeToDb(List<Customer> customers) {
         for(Customer customer : customers ) {
             Log.d(TAG, "writeToDb: customer: " +

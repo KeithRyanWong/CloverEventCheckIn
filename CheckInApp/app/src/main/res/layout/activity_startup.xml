@@ -138,7 +138,7 @@
         android:id="@+id/mainView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <ImageView
             android:id="@+id/cloverLogo"
@@ -157,12 +157,26 @@
             app:layout_constraintVertical_bias="0.41000003"
             app:srcCompat="@drawable/clover_primary_gray_rgb" />
 
+        <Button
+            android:id="@+id/syncButton"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="100dip"
+            android:layout_height="100dip"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/cloverLogo"
+            app:layout_constraintEnd_toEndOf="@+id/cloverLogo"
+            app:layout_constraintStart_toStartOf="@+id/cloverLogo"
+            app:layout_constraintTop_toTopOf="@+id/cloverLogo" />
+
         <TextView
             android:id="@+id/tip1"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
-            android:layout_marginStart="32dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
             android:text="@string/tip2"
             android:textAllCaps="false"
             android:textColor="@color/tip_text"
@@ -174,10 +188,10 @@
 
         <TextView
             android:id="@+id/tip"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
-            android:layout_marginStart="32dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:text="@string/tip1"
             android:textAllCaps="false"

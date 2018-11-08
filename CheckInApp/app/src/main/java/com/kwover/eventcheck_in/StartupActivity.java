@@ -39,6 +39,7 @@ public class StartupActivity extends AppCompatActivity {
     private Button startScanBtn;
     private Button okBtn;
     private Button acknowledgeErrorBtn;
+    private Button syncBtn;
     private ConstraintLayout loadingView;
     private ConstraintLayout mainView;
     private ConstraintLayout errorView;
@@ -67,6 +68,7 @@ public class StartupActivity extends AppCompatActivity {
 //        loadMsg = (TextView) findViewById(R.id.loading_message);
 //        tip1Txt = (TextView) findViewById(R.id.tip1);
         startScanBtn = findViewById(R.id.startScan);
+        syncBtn = findViewById(R.id.syncButton);
         acknowledgeErrorBtn = findViewById(R.id.acknowledgementBtn);
         okBtn = findViewById(R.id.ok);
         warningMsg = findViewById(R.id.warningMsg);
@@ -102,6 +104,32 @@ public class StartupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 transitionToMain();
+            }
+        });
+
+        syncBtn.setSoundEffectsEnabled(false);
+        syncBtn.setOnClickListener(new View.OnClickListener() {
+            private Boolean clickable = true;
+
+            @Override
+            public void onClick(View v) {
+                if(clickable) {
+                    Log.i(TAG, "onClick: Sync button clicked");
+                    customers.resolveUnsyncedCustomers(context);
+
+                    clickable = false;
+                    new CountDownTimer(8000, 1000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            clickable = true;
+                        }
+                    }.start();
+                }
             }
         });
 

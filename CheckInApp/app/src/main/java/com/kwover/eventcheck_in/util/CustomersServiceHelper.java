@@ -53,7 +53,9 @@ public class CustomersServiceHelper {
     public void getCustomers(Context context, CustomersCallbackInterface cb) {
 
         final CustomersCallbackInterface callback = cb;
-        connect(context);
+        if(connector == null) {
+            connect(context);
+        }
         busy = true;
 
         new AsyncTask<Void, Void, List<Customer>>() {

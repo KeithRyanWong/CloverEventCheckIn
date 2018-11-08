@@ -5,8 +5,8 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="loading_message">Syncing guest list with the server</string>
-    <string name="tip1">Haga clic en el botón gris de Flex si se queda atascado escaneando.</string>
-    <string name="tip2">If you get stuck scanning, press the gray button on the Flex\'s left side.</string>
+    <string name="tip1">Pulsa el botón gris en el costada del Flex para salir un escaneo.</string>
+    <string name="tip2">Press the gray button on the side of the Flex to exit a scan.</string>
     <string name="startScan">Escanear</string>
     <string name="acknowledgement">Proceder</string>
     <string name="warning">Se encontró un error al intentar conectarse al servidor. Procediendo sin conexión</string>

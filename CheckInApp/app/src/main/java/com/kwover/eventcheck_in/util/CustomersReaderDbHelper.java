@@ -9,6 +9,9 @@ import android.provider.BaseColumns;
 
 import com.clover.sdk.v1.customer.Customer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by keithwong on 10/26/18.
  */
@@ -114,5 +117,27 @@ public class CustomersReaderDbHelper extends SQLiteOpenHelper{
         }
 
         return customerName;
+    }
+
+    public List<String> fetchUnsyncedEntries(SQLiteDatabase db) {
+
+        String[] cols = new String[] {CustomerEntry.COLUMN_NAME_CUSTOMER_ID};
+        final String WHERE_CLAUSE = CustomerEntry.COLUMN_NAME_SYNCED + " = 0";
+
+
+        Cursor cursor = db.query(CustomerEntry.TABLE_NAME, cols, WHERE_CLAUSE, null, null, null, null, null);
+
+        if(cursor.moveToFirst()) {
+            List<String> customerIds = new ArrayList<String>();
+            customerIds.add(cursor.getString(0));
+
+            while(cursor.moveToNext()){
+                customerIds.add(cursor.getString(0));
+            }
+
+            return customerIds;
+        }
+
+        return null;
     }
 }
