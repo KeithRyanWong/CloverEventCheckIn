@@ -24,7 +24,7 @@ public class Customers {
     private SQLiteDatabase db = null;
     private CustomersReaderDbHelper dbHelper;
     private CustomersServiceHelper servHelper;
-//    private static CustomersAPIHelper apiHelper;
+    private static CustomersAPIHelper apiHelper;
     private Boolean isOpen = false;
 //    private Account account;
 //    private CustomerConnector connector;
@@ -37,7 +37,7 @@ public class Customers {
     public void openDb(Context context) {
         dbHelper = new CustomersReaderDbHelper(context);
         servHelper = new CustomersServiceHelper(context);
-//        apiHelper = new CustomersAPIHelper();
+        apiHelper = new CustomersAPIHelper(context);
 
         db = dbHelper.getWritableDatabase();
         isOpen = true;

@@ -3,6 +3,8 @@
     package="com.kwover.eventcheck_in">
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
 
 
     <application
