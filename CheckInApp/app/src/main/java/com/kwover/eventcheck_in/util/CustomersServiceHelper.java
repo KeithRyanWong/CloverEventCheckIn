@@ -50,36 +50,36 @@ public class CustomersServiceHelper {
     }
 
 
-    public void getCustomers(Context context, CustomersCallbackInterface cb) {
-
-        final CustomersCallbackInterface callback = cb;
-        if(connector == null) {
-            connect(context);
-        }
-        busy = true;
-
-        new AsyncTask<Void, Void, List<Customer>>() {
-            @Override
-            protected List<Customer> doInBackground(Void... voids) {
-                List<Customer> customers = null;
-                try {
-                    customers = connector.getCustomers();
-                } catch (Exception e) {
-                    Log.e(TAG, "getCustomers: Error getting customers through service", e);
-                    return null;
-                }
-                return customers;
-            }
-
-            @Override
-            protected void onPostExecute(List<Customer> customers) {
-                super.onPostExecute(customers);
-                disconnect();
-                busy = false;
-                callback.onQueryFinished(customers);
-            }
-        }.execute();
-    }
+//    public void getCustomers(Context context, CustomersCallbackInterface cb) {
+//
+//        final CustomersCallbackInterface callback = cb;
+//        if(connector == null) {
+//            connect(context);
+//        }
+//        busy = true;
+//
+//        new AsyncTask<Void, Void, List<Customer>>() {
+//            @Override
+//            protected List<Customer> doInBackground(Void... voids) {
+//                List<Customer> customers = null;
+//                try {
+//                    customers = connector.getCustomers();
+//                } catch (Exception e) {
+//                    Log.e(TAG, "getCustomers: Error getting customers through service", e);
+//                    return null;
+//                }
+//                return customers;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(List<Customer> customers) {
+//                super.onPostExecute(customers);
+//                disconnect();
+//                busy = false;
+//                callback.onQueryFinished(customers);
+//            }
+//        }.execute();
+//    }
 
     public void updateCustomer(Context context, String id, CustomersCallbackInterface cb) {
         final CustomersCallbackInterface callback = cb;

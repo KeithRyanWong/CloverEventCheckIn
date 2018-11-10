@@ -6,11 +6,23 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.clover.sdk.util.CloverAccount;
 import com.clover.sdk.util.CloverAuth;
 import com.clover.sdk.v1.customer.Customer;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by keithwong on 10/29/18.
@@ -18,21 +30,18 @@ import java.util.List;
 
 public class CustomersAPIHelper {
     private Account account;
-    private Context context;
-    private String authToken;
+        private String authToken;
     private String baseUrl;
-//    private final static String CUSTOMERS_URI = "/v2/merchant";
+//    private String customersUri = "v3/merchants/" + "ZPW31N7HDTTJ1" + "/customers";
+    private String customersUri = "/v3/merchants/" + "YHAWNHNAW57XY" + "/customers?limit=500";
     private final static String TAG = "CustomersAPIHelper";
     CloverAuth.AuthResult authResult = null;
 
     public CustomersAPIHelper(Context context) {
-        this.context = context;
         account = CloverAccount.getAccount(context);
-
-        getCloverAuth();
     }
 
-    private void getCloverAuth() {
+    public void getCloverAuth(final Context context, final CustomersCallbackInterface cb) {
         // This needs to be done on a background thread
         new AsyncTask<Void, Void, CloverAuth.AuthResult>() {
             private Account mAccount = account;
@@ -54,12 +63,12 @@ public class CustomersAPIHelper {
             @Override
             protected void onPostExecute(CloverAuth.AuthResult result) {
                 authResult = result;
-                configureSettings(result);
+                cb.onAuthResult(result);
             }
         }.execute();
     }
     
-    private void configureSettings(CloverAuth.AuthResult result) {
+    public void configureSettings(CloverAuth.AuthResult result) {
         if(result == null){
             Log.e(TAG, "configureSettings: Cannot configure with null result");
         }
@@ -68,9 +77,38 @@ public class CustomersAPIHelper {
         baseUrl = result.baseUrl;
     }
 
-    public List<Customer> getCustomers(CustomersCallbackInterface cb) {
-        List<Customer> customers = null;
+    public void getCustomers(Context context, final CustomersCallbackInterface cb) {
+        RequestQueue queue = Volley.newRequestQueue(context);
 
-        return customers;
+        StringRequest request = new StringRequest(Request.Method.GET, baseUrl + customersUri,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        JSONArray customers = null;
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response);
+                            customers = jsonResponse.getJSONArray("elements");
+                        } catch (Exception e) {
+                            Log.e(TAG, "onResponse: error converting response to JSON", e);
+                        }
+                        cb.onQueryFinished(customers);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "onErrorResponse: error getting customers", error);
+                cb.onQueryFinished(null);
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap headers = new HashMap();
+                headers.put("Authorization", "Bearer " + authToken);
+                return headers;
+            }
+        };
+
+
+        queue.add(request);
     }
 }

@@ -15,6 +15,7 @@ import android.widget.Button;
 //import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.clover.sdk.util.CloverAuth;
 import com.clover.sdk.v1.Intents;
 import com.clover.sdk.v3.scanner.BarcodeScanner;
 import com.kwover.eventcheck_in.util.ActivityCallbackInterface;
@@ -133,28 +134,53 @@ public class StartupActivity extends AppCompatActivity {
             }
         });
 
-        customers.openDb(context);
-        customers.syncDb(context, new ActivityCallbackInterface() {
-                    @Override
-                    public void onSyncFinishOk() {
-                        //Remove loading bar and message
-                        //transition to check in activity
-                        transitionToMain();
-                    }
+        customers.initializeHelpers(context, new ActivityCallbackInterface() {
+            @Override
+            public void onSyncFinishOk() {
 
-                    @Override
-                    public void onSyncFinishBad() {
-                        //transition to error message
-                        Log.e(TAG, "onSyncFinishBad: There was an error grabbing data from the server");
-                        transitionToError("Se encontró un error al intentar conectarse al servidor. Procediendo sin conexión");
-                    }
+            }
 
-                    @Override
-                    public void onUpdateFinished(Boolean finishedOk, String[] customerName) {
+            @Override
+            public void onSyncFinishBad() {
 
-                    }
-                }
-        );
+            }
+
+            @Override
+            public void onUpdateFinished(Boolean finishedOk, String[] customerName) {
+
+            }
+
+            @Override
+            public void onHelpersInitialized() {
+                customers.openDb(context);
+                customers.syncDb(context, new ActivityCallbackInterface() {
+                            @Override
+                            public void onSyncFinishOk() {
+                                //Remove loading bar and message
+                                //transition to check in activity
+                                transitionToMain();
+                            }
+
+                            @Override
+                            public void onSyncFinishBad() {
+                                //transition to error message
+                                Log.e(TAG, "onSyncFinishBad: There was an error grabbing data from the server");
+                                transitionToError("Se encontró un error al intentar conectarse al servidor. Procediendo sin conexión");
+                            }
+
+                            @Override
+                            public void onUpdateFinished(Boolean finishedOk, String[] customerName) {
+
+                            }
+
+                            @Override
+                            public void onHelpersInitialized() {
+
+                            }
+                        }
+                );
+            }
+        });
     }
 
     @Override
@@ -222,6 +248,11 @@ public class StartupActivity extends AppCompatActivity {
                 } else {
                     Log.i(TAG, "onUpdateFinished: Error syncing " + customerId + " through Customers Service.");
                 }
+
+            }
+
+            @Override
+            public void onHelpersInitialized() {
 
             }
         });
