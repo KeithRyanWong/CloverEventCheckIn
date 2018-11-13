@@ -81,8 +81,8 @@ public class CustomersServiceHelper {
 //        }.execute();
 //    }
 
-    public void updateCustomer(Context context, String id, CustomersCallbackInterface cb) {
-        final CustomersCallbackInterface callback = cb;
+    public void updateCustomer(Context context, String id, CustomersServiceCallbackInterface cb) {
+        final CustomersServiceCallbackInterface callback = cb;
 //        final Customer customer = c;
         final String customer_id = id;
         if(connector == null) {

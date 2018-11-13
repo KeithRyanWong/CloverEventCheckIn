@@ -38,26 +38,21 @@ public class Customers {
 
     public Customers(){}
 
-    public void initializeHelpers(Context context, final ActivityCallbackInterface cb) {
+    public void initializeHelpers(Context context, final CustomersCallbackInterface cb) {
         dbHelper = new CustomersReaderDbHelper(context);
         servHelper = new CustomersServiceHelper(context);
         apiHelper = new CustomersAPIHelper(context);
 
-        apiHelper.getCloverAuth(context, new CustomersCallbackInterface() {
+        apiHelper.initializeAPIHelper(context, new CustomersAPICallbackInterface() {
             @Override
             public void onQueryFinished(JSONArray customers) {
 
             }
 
             @Override
-            public void onUpdateFinished(Boolean finishedOk) {
-
-            }
-
-            @Override
             public void onAuthResult(CloverAuth.AuthResult authResult) {
                 apiHelper.configureSettings(authResult);
-                cb.onHelpersInitialized();
+                cb.onHelpersInitialized(authResult);
             }
         });
     }
@@ -67,8 +62,8 @@ public class Customers {
         isOpen = true;
     }
 
-    public void syncDb(final Context context, final ActivityCallbackInterface cb) {
-        apiHelper.getCustomers(context, new CustomersCallbackInterface() {
+    public void syncDb(final Context context, final CustomersCallbackInterface cb) {
+        apiHelper.getCustomers(context, new CustomersAPICallbackInterface() {
 //            @Override
 //            public void onQueryFinished(List<Customer> customers) {
 //                if (customers == null) {
@@ -93,11 +88,6 @@ public class Customers {
             }
 
             @Override
-            public void onUpdateFinished(Boolean result) {
-
-            }
-
-            @Override
             public void onAuthResult(CloverAuth.AuthResult authResult) {
 
             }
@@ -105,30 +95,20 @@ public class Customers {
 
     }
 
-    public void markCustomerAttended(final Context context, final String customer_Id, final ActivityCallbackInterface cb) {
+    public void markCustomerAttended(final Context context, final String customer_Id, final CustomersCallbackInterface cb) {
         //Try to update customers in DB first
         //Then try to update via the service/api
         dbHelper.updateRowByCustomerId(db, customer_Id, null, null, 1, 0);
 
         final String[] customerName = dbHelper.fetchFullName(db, customer_Id);
 
-        servHelper.updateCustomer(context, customer_Id, new CustomersCallbackInterface() {
-            @Override
-            public void onQueryFinished(JSONArray customers) {
-
-            }
-
+        servHelper.updateCustomer(context, customer_Id, new CustomersServiceCallbackInterface() {
             @Override
             public void onUpdateFinished(Boolean finishedOk) {
                 if (finishedOk) {
                     dbHelper.updateRowByCustomerId(db, customer_Id, null, null, null, 1);
                 }
                 cb.onUpdateFinished(finishedOk, customerName);
-            }
-
-            @Override
-            public void onAuthResult(CloverAuth.AuthResult authResult) {
-
             }
         });
     }
@@ -140,7 +120,7 @@ public class Customers {
 //            submit the customers through service
 //            mark them synced
             for (String customerId : customerIds) {
-                markCustomerAttended(context, customerId, new ActivityCallbackInterface() {
+                markCustomerAttended(context, customerId, new CustomersCallbackInterface() {
                     @Override
                     public void onSyncFinishOk() {
 
@@ -152,13 +132,13 @@ public class Customers {
                     }
 
                     @Override
-                    public void onUpdateFinished(Boolean finishedOk, String[] customerName) {
-                        Log.i(TAG, "onUpdateFinished: synced " + customerName[0] + " " + customerName[1]);
+                    public void onHelpersInitialized(CloverAuth.AuthResult authResult) {
+
                     }
 
                     @Override
-                    public void onHelpersInitialized() {
-
+                    public void onUpdateFinished(Boolean finishedOk, String[] customerName) {
+                        Log.i(TAG, "onUpdateFinished: synced " + customerName[0] + " " + customerName[1]);
                     }
                 });
             }
@@ -202,7 +182,7 @@ public class Customers {
                 );
 
             } catch (Exception e) {
-                Log.e(TAG, "writeToDb: Error readying JSON object", e);
+                Log.e(TAG, "writeToDb: Error reading JSON object", e);
             }
         }
     }
