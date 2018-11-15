@@ -15,7 +15,11 @@ import java.util.List;
 
 public interface CustomersCallbackInterface {
 //    void onQueryFinished(List<Customer> customers);
-    void onQueryFinished(JSONArray customers);
-    void onUpdateFinished(Boolean finishedOk);
-    void onAuthResult(CloverAuth.AuthResult authResult);
+    void onSyncFinishOk();
+    void onSyncFinishBad();
+    void onUpdateFinished(Boolean finishedOk, String[] customerName);
+//    void onQueryFinished(JSONArray customers);
+//
+//    void onAuthResult(CloverAuth.AuthResult authResult);
+    void onHelpersInitialized(CloverAuth.AuthResult authResult);
 }

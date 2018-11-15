@@ -16,6 +16,7 @@ import com.android.volley.toolbox.Volley;
 import com.clover.sdk.util.CloverAccount;
 import com.clover.sdk.util.CloverAuth;
 import com.clover.sdk.v1.customer.Customer;
+import com.clover.sdk.v1.merchant.Merchant;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,18 +31,31 @@ import java.util.Map;
 
 public class CustomersAPIHelper {
     private Account account;
-        private String authToken;
+    private String authToken;
     private String baseUrl;
-//    private String customersUri = "v3/merchants/" + "ZPW31N7HDTTJ1" + "/customers";
-    private String customersUri = "/v3/merchants/" + "YHAWNHNAW57XY" + "/customers?limit=500";
+    private String mid;
+    private String customersUri;
+    private MerchantServiceHelper merchantHelper;
     private final static String TAG = "CustomersAPIHelper";
     CloverAuth.AuthResult authResult = null;
 
     public CustomersAPIHelper(Context context) {
         account = CloverAccount.getAccount(context);
+        merchantHelper = new MerchantServiceHelper(context);
     }
 
-    public void getCloverAuth(final Context context, final CustomersCallbackInterface cb) {
+    public void initializeAPIHelper(final Context context, final CustomersAPICallbackInterface cb) {
+        merchantHelper.getMerchant(context, new MerchantCallbackInterface() {
+            @Override
+            public void onReceiveMerchant(Merchant merchant) {
+                mid = merchant.getId();
+                getCloverAuth(context, cb);
+            }
+        });
+    }
+
+
+    public void getCloverAuth(final Context context, final CustomersAPICallbackInterface cb) {
         // This needs to be done on a background thread
         new AsyncTask<Void, Void, CloverAuth.AuthResult>() {
             private Account mAccount = account;
@@ -71,13 +85,15 @@ public class CustomersAPIHelper {
     public void configureSettings(CloverAuth.AuthResult result) {
         if(result == null){
             Log.e(TAG, "configureSettings: Cannot configure with null result");
+            return;
         }
 
         authToken = result.authToken;
         baseUrl = result.baseUrl;
+        customersUri = "/v3/merchants/" + mid + "/customers?limit=500";
     }
 
-    public void getCustomers(Context context, final CustomersCallbackInterface cb) {
+    public void getCustomers(Context context, final CustomersAPICallbackInterface cb) {
         RequestQueue queue = Volley.newRequestQueue(context);
 
         StringRequest request = new StringRequest(Request.Method.GET, baseUrl + customersUri,

@@ -18,9 +18,10 @@ import android.widget.TextView;
 import com.clover.sdk.util.CloverAuth;
 import com.clover.sdk.v1.Intents;
 import com.clover.sdk.v3.scanner.BarcodeScanner;
-import com.kwover.eventcheck_in.util.ActivityCallbackInterface;
 import com.kwover.eventcheck_in.util.Customers;
+import com.kwover.eventcheck_in.util.CustomersCallbackInterface;
 
+import org.json.JSONArray;
 
 
 public class StartupActivity extends AppCompatActivity {
@@ -134,26 +135,19 @@ public class StartupActivity extends AppCompatActivity {
             }
         });
 
-        customers.initializeHelpers(context, new ActivityCallbackInterface() {
+        customers.initializeHelpers(context, new CustomersCallbackInterface() {
             @Override
-            public void onSyncFinishOk() {
+            public void onHelpersInitialized(CloverAuth.AuthResult authResult) {
+                //insert error handling for failing to initialize helper
+                if(authResult == null) {
+                    Log.e(TAG, "onHelpersInitialized: Error initalizing helpers");
+                    customers.openDb(context);
+                    transitionToError("Se encontró un error al intentar conectarse al servidor. Procediendo sin conexión");
+                    return;
+                }
 
-            }
-
-            @Override
-            public void onSyncFinishBad() {
-
-            }
-
-            @Override
-            public void onUpdateFinished(Boolean finishedOk, String[] customerName) {
-
-            }
-
-            @Override
-            public void onHelpersInitialized() {
                 customers.openDb(context);
-                customers.syncDb(context, new ActivityCallbackInterface() {
+                customers.syncDb(context, new CustomersCallbackInterface() {
                             @Override
                             public void onSyncFinishOk() {
                                 //Remove loading bar and message
@@ -174,11 +168,26 @@ public class StartupActivity extends AppCompatActivity {
                             }
 
                             @Override
-                            public void onHelpersInitialized() {
+                            public void onHelpersInitialized(CloverAuth.AuthResult authResult) {
 
                             }
                         }
                 );
+            }
+
+            @Override
+            public void onUpdateFinished(Boolean finishedOk, String[] customerName) {
+
+            }
+
+            @Override
+            public void onSyncFinishBad() {
+
+            }
+
+            @Override
+            public void onSyncFinishOk() {
+
             }
         });
     }
@@ -228,7 +237,7 @@ public class StartupActivity extends AppCompatActivity {
     private void markCustomerAttended(final String customerId) {
         final Context context = this;
 
-        customers.markCustomerAttended(context, customerId , new ActivityCallbackInterface() {
+        customers.markCustomerAttended(context, customerId , new CustomersCallbackInterface() {
             @Override
             public void onSyncFinishOk() {
 
@@ -236,6 +245,11 @@ public class StartupActivity extends AppCompatActivity {
 
             @Override
             public void onSyncFinishBad() {
+
+            }
+
+            @Override
+            public void onHelpersInitialized(CloverAuth.AuthResult authResult) {
 
             }
 
@@ -248,12 +262,6 @@ public class StartupActivity extends AppCompatActivity {
                 } else {
                     Log.i(TAG, "onUpdateFinished: Error syncing " + customerId + " through Customers Service.");
                 }
-
-            }
-
-            @Override
-            public void onHelpersInitialized() {
-
             }
         });
         
